@@ -1,0 +1,269 @@
+{
+  "RJA_Trigger": {
+    "Type": "SimpleFolder",
+    "ControlmServer": "cirrocumulus",
+    "SiteStandard": "RJA_Los_Standaard",
+    "OrderMethod": "Manual",
+    "RJA_Wait": {
+      "Type": "Job:Command",
+      "Host": "cirrocumulus",
+      "CreatedBy": "emuser",
+      "RunAs": "ctmserver",
+      "Application": "RJA_Cloud",
+      "Command": "sleep 20",
+      "When": {
+        "WeekDays": [
+          "NONE"
+        ],
+        "MonthDays": [
+          "ALL"
+        ],
+        "DaysRelation": "OR"
+      },
+      "eventsToAdd": {
+        "Type": "AddEvents",
+        "Events": [
+          {
+            "Event": "RJA_Wait-TO-RJA_AWS"
+          },
+          {
+            "Event": "RJA_Wait-TO-RJA_Azure"
+          },
+          {
+            "Event": "RJA_Wait-TO-RJA_GCP"
+          },
+          {
+            "Event": "RJA_Wait-TO-RJA_Kub"
+          }
+        ]
+      }
+    },
+    "RJA_AWS": {
+      "Type": "Job:AWS:Lambda",
+      "ConnectionProfile": "TMO_AWS",
+      "FunctionName": "TMO_PrintPayload",
+      "Payload": "{\\n   \"name\": \" This is Control-M\"\\n}",
+      "Host": "cirrocumulus",
+      "CreatedBy": "emuser",
+      "RunAs": "TMO_AWS",
+      "Application": "RJA_Cloud",
+      "When": {
+        "WeekDays": [
+          "NONE"
+        ],
+        "MonthDays": [
+          "ALL"
+        ],
+        "DaysRelation": "OR"
+      },
+      "eventsToWaitFor": {
+        "Type": "WaitForEvents",
+        "Events": [
+          {
+            "Event": "RJA_Wait-TO-RJA_AWS"
+          }
+        ]
+      },
+      "eventsToAdd": {
+        "Type": "AddEvents",
+        "Events": [
+          {
+            "Event": "RJA_AWS-TO-RJA_Event_Service"
+          }
+        ]
+      },
+      "eventsToDelete": {
+        "Type": "DeleteEvents",
+        "Events": [
+          {
+            "Event": "RJA_Wait-TO-RJA_AWS"
+          }
+        ]
+      }
+    },
+    "RJA_Azure": {
+      "Type": "Job:ApplicationIntegrator:AI Azure Data Factory",
+      "ConnectionProfile": "TMO_AZURE",
+      "AI-PipelineName": "tmo-datapipeline",
+      "RunAsDummy": true,
+      "Host": "cirrocumulus",
+      "CreatedBy": "emuser",
+      "RunAs": "TMO_AZURE",
+      "Application": "RJA_Cloud",
+      "When": {
+        "WeekDays": [
+          "NONE"
+        ],
+        "MonthDays": [
+          "ALL"
+        ],
+        "DaysRelation": "OR"
+      },
+      "eventsToWaitFor": {
+        "Type": "WaitForEvents",
+        "Events": [
+          {
+            "Event": "RJA_Wait-TO-RJA_Azure"
+          }
+        ]
+      },
+      "eventsToAdd": {
+        "Type": "AddEvents",
+        "Events": [
+          {
+            "Event": "RJA_Azure-TO-RJA_Event_Service"
+          }
+        ]
+      },
+      "eventsToDelete": {
+        "Type": "DeleteEvents",
+        "Events": [
+          {
+            "Event": "RJA_Wait-TO-RJA_Azure"
+          }
+        ]
+      }
+    },
+    "RJA_GCP": {
+      "Type": "Job:ApplicationIntegrator:AI GCPPubSub",
+      "ConnectionProfile": "NONE",
+      "AI-Topic": "projects/absolute-pulsar-288916/topics/Data",
+      "AI-Action to perform": "Publish",
+      "AI-Message": "Yippee its Friday",
+      "Host": "cirrocumulus",
+      "CreatedBy": "emuser",
+      "Application": "RJA_Cloud",
+      "When": {
+        "WeekDays": [
+          "NONE"
+        ],
+        "MonthDays": [
+          "ALL"
+        ],
+        "DaysRelation": "OR"
+      },
+      "eventsToWaitFor": {
+        "Type": "WaitForEvents",
+        "Events": [
+          {
+            "Event": "RJA_Wait-TO-RJA_GCP"
+          }
+        ]
+      },
+      "eventsToAdd": {
+        "Type": "AddEvents",
+        "Events": [
+          {
+            "Event": "RJA_GCP-TO-RJA_Event_Service"
+          }
+        ]
+      },
+      "eventsToDelete": {
+        "Type": "DeleteEvents",
+        "Events": [
+          {
+            "Event": "RJA_Wait-TO-RJA_GCP"
+          }
+        ]
+      }
+    },
+    "RJA_Event_Service": {
+      "Type": "Job:SLAManagement",
+      "ServiceName": "Event trigger service",
+      "ServicePriority": "3",
+      "JobRunsDeviationsTolerance": "3",
+      "CreatedBy": "emuser",
+      "RunAs": "ctmserver",
+      "Application": "RJA_Cloud",
+      "CompleteIn": {
+        "Time": "0:7"
+      },
+      "When": {
+        "WeekDays": [
+          "NONE"
+        ],
+        "MonthDays": [
+          "ALL"
+        ],
+        "DaysRelation": "OR"
+      },
+      "eventsToWaitFor": {
+        "Type": "WaitForEvents",
+        "Events": [
+          {
+            "Event": "RJA_AWS-TO-RJA_Event_Service"
+          },
+          {
+            "Event": "RJA_Azure-TO-RJA_Event_Service"
+          },
+          {
+            "Event": "RJA_GCP-TO-RJA_Event_Service"
+          },
+          {
+            "Event": "RJA_Kub-TO-RJA_Event_Service"
+          }
+        ]
+      },
+      "eventsToDelete": {
+        "Type": "DeleteEvents",
+        "Events": [
+          {
+            "Event": "RJA_AWS-TO-RJA_Event_Service"
+          },
+          {
+            "Event": "RJA_Azure-TO-RJA_Event_Service"
+          },
+          {
+            "Event": "RJA_GCP-TO-RJA_Event_Service"
+          },
+          {
+            "Event": "RJA_Kub-TO-RJA_Event_Service"
+          }
+        ]
+      }
+    },
+    "RJA_Kub": {
+      "Type": "Job:ApplicationIntegrator:AI Kubernetes",
+      "ConnectionProfile": "AWS",
+      "AI-action": "Apply (Job Resource)",
+      "AI-YAML File": "https://kubernetes.io/examples/controllers/job.yaml",
+      "Host": "cirrocumulus",
+      "CreatedBy": "emuser",
+      "RunAs": "AWS",
+      "Application": "RJA_Cloud",
+      "When": {
+        "WeekDays": [
+          "NONE"
+        ],
+        "MonthDays": [
+          "ALL"
+        ],
+        "DaysRelation": "OR"
+      },
+      "eventsToWaitFor": {
+        "Type": "WaitForEvents",
+        "Events": [
+          {
+            "Event": "RJA_Wait-TO-RJA_Kub"
+          }
+        ]
+      },
+      "eventsToAdd": {
+        "Type": "AddEvents",
+        "Events": [
+          {
+            "Event": "RJA_Kub-TO-RJA_Event_Service"
+          }
+        ]
+      },
+      "eventsToDelete": {
+        "Type": "DeleteEvents",
+        "Events": [
+          {
+            "Event": "RJA_Wait-TO-RJA_Kub"
+          }
+        ]
+      }
+    }
+  }
+}
