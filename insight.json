@@ -9,7 +9,7 @@
       "Host": "cirrocumulus",
       "CreatedBy": "emuser",
       "RunAs": "ctmserver",
-      "Application": "RJA_Cloud",
+      "Application": "RJA_Insight_Test",
       "Command": "sleep 20",
       "When": {
         "WeekDays": [
@@ -31,22 +31,20 @@
           },
           {
             "Event": "RJA_Wait-TO-RJA_GCP"
-          },
-          {
-            "Event": "RJA_Wait-TO-RJA_Kub"
           }
         ]
       }
     },
-    "RJA_AWS": {
+    "RJA_AWS_Test": {
       "Type": "Job:AWS:Lambda",
-      "ConnectionProfile": "TMO_AWS",
+      "ConnectionProfile": "RJA_AWS",
       "FunctionName": "TMO_PrintPayload",
       "Payload": "{\\n   \"name\": \" This is Control-M\"\\n}",
-      "Host": "cirrocumulus",
+      "RunAsDummy": true,
+      "Host": "host1",
       "CreatedBy": "emuser",
-      "RunAs": "TMO_AWS",
-      "Application": "RJA_Cloud",
+      "RunAs": "RJA_AWS",
+      "Application": "RJA_Insight_Test",
       "When": {
         "WeekDays": [
           "NONE"
@@ -61,14 +59,6 @@
         "Events": [
           {
             "Event": "RJA_Wait-TO-RJA_AWS"
-          }
-        ]
-      },
-      "eventsToAdd": {
-        "Type": "AddEvents",
-        "Events": [
-          {
-            "Event": "RJA_AWS-TO-RJA_Event_Service"
           }
         ]
       },
@@ -83,13 +73,13 @@
     },
     "RJA_Azure": {
       "Type": "Job:ApplicationIntegrator:AI Azure Data Factory",
-      "ConnectionProfile": "TMO_AZURE",
+      "ConnectionProfile": "RJA_AZURE",
       "AI-PipelineName": "tmo-datapipeline",
       "RunAsDummy": true,
-      "Host": "cirrocumulus",
+      "Host": "host2",
       "CreatedBy": "emuser",
       "RunAs": "TMO_AZURE",
-      "Application": "RJA_Cloud",
+      "Application": "RJA_Insight_Test",
       "When": {
         "WeekDays": [
           "NONE"
@@ -104,14 +94,6 @@
         "Events": [
           {
             "Event": "RJA_Wait-TO-RJA_Azure"
-          }
-        ]
-      },
-      "eventsToAdd": {
-        "Type": "AddEvents",
-        "Events": [
-          {
-            "Event": "RJA_Azure-TO-RJA_Event_Service"
           }
         ]
       },
@@ -126,13 +108,14 @@
     },
     "RJA_GCP": {
       "Type": "Job:ApplicationIntegrator:AI GCPPubSub",
-      "ConnectionProfile": "NONE",
+      "ConnectionProfile": "RJA_GCP",
       "AI-Topic": "projects/absolute-pulsar-288916/topics/Data",
       "AI-Action to perform": "Publish",
       "AI-Message": "Yippee its Friday",
-      "Host": "cirrocumulus",
+      "RunAsDummy": true,
+      "Host": "host3",
       "CreatedBy": "emuser",
-      "Application": "RJA_Cloud",
+      "Application": "RJA_Insight_Test",
       "When": {
         "WeekDays": [
           "NONE"
@@ -150,117 +133,11 @@
           }
         ]
       },
-      "eventsToAdd": {
-        "Type": "AddEvents",
-        "Events": [
-          {
-            "Event": "RJA_GCP-TO-RJA_Event_Service"
-          }
-        ]
-      },
       "eventsToDelete": {
         "Type": "DeleteEvents",
         "Events": [
           {
             "Event": "RJA_Wait-TO-RJA_GCP"
-          }
-        ]
-      }
-    },
-    "RJA_Event_Service": {
-      "Type": "Job:SLAManagement",
-      "ServiceName": "Event trigger service",
-      "ServicePriority": "3",
-      "JobRunsDeviationsTolerance": "3",
-      "CreatedBy": "emuser",
-      "RunAs": "ctmserver",
-      "Application": "RJA_Cloud",
-      "CompleteIn": {
-        "Time": "0:7"
-      },
-      "When": {
-        "WeekDays": [
-          "NONE"
-        ],
-        "MonthDays": [
-          "ALL"
-        ],
-        "DaysRelation": "OR"
-      },
-      "eventsToWaitFor": {
-        "Type": "WaitForEvents",
-        "Events": [
-          {
-            "Event": "RJA_AWS-TO-RJA_Event_Service"
-          },
-          {
-            "Event": "RJA_Azure-TO-RJA_Event_Service"
-          },
-          {
-            "Event": "RJA_GCP-TO-RJA_Event_Service"
-          },
-          {
-            "Event": "RJA_Kub-TO-RJA_Event_Service"
-          }
-        ]
-      },
-      "eventsToDelete": {
-        "Type": "DeleteEvents",
-        "Events": [
-          {
-            "Event": "RJA_AWS-TO-RJA_Event_Service"
-          },
-          {
-            "Event": "RJA_Azure-TO-RJA_Event_Service"
-          },
-          {
-            "Event": "RJA_GCP-TO-RJA_Event_Service"
-          },
-          {
-            "Event": "RJA_Kub-TO-RJA_Event_Service"
-          }
-        ]
-      }
-    },
-    "RJA_Kub": {
-      "Type": "Job:ApplicationIntegrator:AI Kubernetes",
-      "ConnectionProfile": "AWS",
-      "AI-action": "Apply (Job Resource)",
-      "AI-YAML File": "https://kubernetes.io/examples/controllers/job.yaml",
-      "Host": "cirrocumulus",
-      "CreatedBy": "emuser",
-      "RunAs": "AWS",
-      "Application": "RJA_Cloud",
-      "When": {
-        "WeekDays": [
-          "NONE"
-        ],
-        "MonthDays": [
-          "ALL"
-        ],
-        "DaysRelation": "OR"
-      },
-      "eventsToWaitFor": {
-        "Type": "WaitForEvents",
-        "Events": [
-          {
-            "Event": "RJA_Wait-TO-RJA_Kub"
-          }
-        ]
-      },
-      "eventsToAdd": {
-        "Type": "AddEvents",
-        "Events": [
-          {
-            "Event": "RJA_Kub-TO-RJA_Event_Service"
-          }
-        ]
-      },
-      "eventsToDelete": {
-        "Type": "DeleteEvents",
-        "Events": [
-          {
-            "Event": "RJA_Wait-TO-RJA_Kub"
           }
         ]
       }

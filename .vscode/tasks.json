@@ -1,0 +1,58 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build in Control-M",
+            "type": "shell",
+            "command": "ctm build '${file}'",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run in Control-M",
+            "type": "shell",
+            "command": "ctm run '${file}'>output-run-id.json;cat output-run-id.json",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Get status from Control-M",
+            "type": "shell",
+            "command": "ctm run status '${selectedText}'>output.json;cat output.json",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Get job output from Control-M",
+            "type": "shell",
+            "command": "ctm run job:output::get '${selectedText}'",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Get job log from Control-M",
+            "type": "shell",
+            "command": "ctm run job:log::get '${selectedText}'",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+        
+    ]
+}

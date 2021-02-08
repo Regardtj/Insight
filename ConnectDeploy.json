@@ -1,0 +1,48 @@
+{
+    "DeployDescriptor":
+    [
+      {
+        "Property" : "ControlmServer",
+        "Assign"   : "cirrocumulus"
+      },
+      {
+        "ApplyOn"  :  {"Type":"Folder"},
+        "Property" : "@",
+        "Replace"  : [ {"RJA_Trigger(.*)" : "RJA_Insight$1"} ]
+      },
+      {
+        "ApplyOn"  :  {"Type":"Job"},
+        "Property" : "@",
+        "Replace"  : [ {"RJA_AWS(.*)" : "RJA_AWS_Test$1"} ] 
+      },
+      {  
+        "Property" : "SiteStandard",
+        "Replace"  : [ {"RJA_Dev_Standard(.*)" : "RJA_Los_Standaard$1"} ]
+      },
+      {
+        "Property" : "Application",
+        "Replace"  : [ {"RJA_Cloud(.*)" : "RJA_Insight_Test$1"} ]
+      },
+      {
+        "Property": "Host",
+        "ApplyOn" :  {"Type":"Job.*"},
+        "Source": "@",
+        "Replace": [
+                { "RJA_AWS":"host1"},
+                { "RJA_Azure":"host2"},
+                { "RJA_GCP":"host3"} 
+                ]
+        },
+        {
+        "Property": "ConnectionProfile",
+        "ApplyOn" :  {"Type":"Job.*"},
+        "Source": "@",
+        "Replace": [
+                { "Jobname":"New_ConnectionProfile-Name"},
+                { "RJA_Job2":"RJA_AZURE"},
+                { "RJA_Job3":"RJA_GCP"} 
+                ]
+            }
+    ]
+  }
+  
